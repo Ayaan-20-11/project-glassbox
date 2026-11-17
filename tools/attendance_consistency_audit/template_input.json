@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "observation_note": "Replace with notes from your own student dashboard view",
+    "observed_at": "YYYY-MM-DD HH:MM IST"
+  },
+  "subjects": [
+    {
+      "name": "Example Subject A",
+      "present": 18,
+      "total_held": 23,
+      "absent": 4,
+      "excused": 1,
+      "late": 0,
+      "cancelled": 0,
+      "displayed_pct": 78.26,
+      "displayed_decimals": 2,
+      "weight": 1.0,
+      "notes": "Summary card vs subject detail"
+    }
+  ],
+  "overall": {
+    "displayed_pct": 78.26,
+    "displayed_decimals": 2,
+    "displayed_present": 18,
+    "displayed_total": 23,
+    "notes": "Top dashboard overall widget"
+  }
+}
