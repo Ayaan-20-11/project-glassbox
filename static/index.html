@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Newton Dashboard // Security Research Lab (Isolated Simulation)</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="pulse-dot" aria-hidden="true"></span>
+      <div>
+        <h1>NEWTON DASHBOARD // SECURITY RESEARCH LAB</h1>
+        <p class="subtitle">Isolated Localhost Simulation &bull; Synthetic Accounts Only &bull; Zero Production Traffic</p>
+      </div>
+    </div>
+
+    <div class="topbar-controls">
+      <div class="session-pill" id="session-pill">
+        <span class="label">ACTIVE SIM PERSONA:</span>
+        <strong id="session-user">STU-1042 (Aarav Sharma)</strong>
+      </div>
+      <div class="mode-switch" role="group" aria-label="Lab security posture mode">
+        <button type="button" class="mode-btn" id="mode-vuln" aria-pressed="true">VULNERABLE LAB</button>
+        <button type="button" class="mode-btn" id="mode-secure" aria-pressed="false">REMEDIATED</button>
+      </div>
+    </div>
+  </header>
+
+  <section id="mock-alert-banner" class="mock-alert" role="status" aria-live="polite" hidden>
+    <div class="mock-alert-inner">
+      <span class="alert-tag">MOCK DASHBOARD SECURITY ALERT</span>
+      <span id="mock-alert-text">Simulation alert ready.</span>
+    </div>
+    <button type="button" id="dismiss-alert" class="btn-ghost">Dismiss</button>
+  </section>
+
+  <main class="workspace">
+    <section class="mock-kpi-strip" aria-label="Synthetic student attendance overview">
+      <article class="kpi-card">
+        <span class="kpi-label">SYNTHETIC ATTENDANCE</span>
+        <strong class="kpi-value" id="kpi-pct">76%</strong>
+        <span class="kpi-meta" id="kpi-ratio">128 / 169 counted (189 scheduled)</span>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">YOGA-B1 UNMARKED ('-')</span>
+        <strong class="kpi-value">8</strong>
+        <span class="kpi-meta">Excluded from denominator in sim</span>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">LAB SECURITY POSTURE</span>
+        <strong class="kpi-value" id="kpi-posture">VULNERABLE</strong>
+        <span class="kpi-meta" id="kpi-open-count">4 active simulated flaws</span>
+      </article>
+      <article class="kpi-card kpi-actions">
+        <span class="kpi-label">STATE HYDRATION SIM</span>
+        <div class="btn-row">
+          <button type="button" id="btn-sim-refresh-bug" class="btn-secondary">Simulate Refresh 0/0 Bug</button>
+          <button type="button" id="btn-restore-kpi" class="btn-ghost">Restore</button>
+        </div>
+      </article>
+    </section>
+
+    <div class="tabs-shell">
+      <div class="tablist" role="tablist" aria-label="Security Research Lab Modules">
+        <button type="button" role="tab" id="tab-scanner" aria-selected="true" tabindex="0">1. Console &amp; Scanner</button>
+        <button type="button" role="tab" id="tab-xss" aria-selected="false" tabindex="-1">2. Reflected XSS Lab</button>
+        <button type="button" role="tab" id="tab-idor" aria-selected="false" tabindex="-1">3. Broken Access Control</button>
+        <button type="button" role="tab" id="tab-findings" aria-selected="false" tabindex="-1">4. Findings Panel</button>
+        <button type="button" role="tab" id="tab-report" aria-selected="false" tabindex="-1">5. Assessment Report</button>
+      </div>
+
+      <!-- TAB 1: SCANNER -->
+      <div role="tabpanel" id="panel-scanner" aria-labelledby="tab-scanner" tabindex="0" class="tab-panel">
+        <div class="panel-body">
+          <div class="panel-header">
+            <div>
+              <h2>Automated Local Lab Scanner</h2>
+              <p class="muted">Runs deterministic security checks against the active local simulation profile (<code>127.0.0.1</code> only).</p>
+            </div>
+            <button type="button" id="btn-run-scan" class="btn-primary">Run Simulated Audit Scan</button>
+          </div>
+
+          <div class="progress-block" aria-live="polite">
+            <div class="progress-meta">
+              <span id="scan-status-text">Idle &mdash; click "Run Simulated Audit Scan" to begin.</span>
+              <span id="scan-percent">0%</span>
+            </div>
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="scan-progressbar">
+              <div class="progress-fill" id="scan-progress-fill"></div>
+            </div>
+          </div>
+
+          <div class="scan-grid" id="scan-checks-grid"></div>
+        </div>
+      </div>
+
+      <!-- TAB 2: REFLECTED XSS -->
+      <div role="tabpanel" id="panel-xss" aria-labelledby="tab-xss" class="tab-panel" hidden>
+        <div class="panel-body">
+          <div class="panel-header">
+            <div>
+              <h2>Reflected XSS Demonstration (Sandboxed Iframe)</h2>
+              <p class="muted">Tests how unsanitized query reflection executes inside an isolated <code>sandbox="allow-scripts"</code> mock widget, and how HTML-escaping + CSP neutralize it.</p>
+            </div>
+          </div>
+
+          <form id="xss-form" class="lab-controls">
+            <label for="xss-input" class="field-label">Mock Course Search Query (<code>?q=</code>)</label>
+            <div class="input-row">
+              <input id="xss-input" type="text" value='<img src="x" onerror="simAlert(\'Reflected XSS inside sandboxed mock frame\')">' autocomplete="off">
+              <button type="submit" class="btn-primary">Execute Local Reflection</button>
+            </div>
+            <div class="preset-row">
+              <span class="muted">Presets:</span>
+              <button type="button" class="btn-chip" data-xss-preset="Algorithms">Benign: Algorithms</button>
+              <button type="button" class="btn-chip" data-xss-preset='<img src="x" onerror="simAlert(\'IMG onerror XSS Simulation\')">'>IMG onerror</button>
+              <button type="button" class="btn-chip" data-xss-preset='<svg onload="simAlert(\'SVG onload XSS Simulation\')">'>SVG onload</button>
+            </div>
+          </form>
+
+          <div class="split-grid">
+            <div class="card">
+              <h3>Sandboxed Mock Dashboard Widget</h3>
+              <iframe id="xss-frame" class="xss-iframe" title="Sandboxed mock course search reflection preview" sandbox="allow-scripts"></iframe>
+            </div>
+            <div class="card">
+              <h3>Safe Source Inspection &amp; Remediation</h3>
+              <p class="muted">Reflected HTML snippet (rendered safely via <code>textContent</code>):</p>
+              <pre class="code-box" id="xss-raw-echo"></pre>
+              <p class="muted">Defense pattern:</p>
+              <pre class="code-box" id="xss-defense-note"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: BROKEN ACCESS CONTROL / IDOR -->
+      <div role="tabpanel" id="panel-idor" aria-labelledby="tab-idor" class="tab-panel" hidden>
+        <div class="panel-body">
+          <div class="panel-header">
+            <div>
+              <h2>Broken Object-Level Authorization (IDOR) Scenario</h2>
+              <p class="muted">Simulates requesting <code>GET /api/student/attendance?student_id=...</code> while authenticated as <code>STU-1042</code>.</p>
+            </div>
+          </div>
+
+          <div class="lab-controls">
+            <span class="field-label">Select Synthetic Target Student ID:</span>
+            <div class="btn-row">
+              <button type="button" class="btn-secondary idor-target" data-student-id="STU-1042">STU-1042 (Own Record)</button>
+              <button type="button" class="btn-secondary idor-target" data-student-id="STU-1099">STU-1099 (Synthetic Peer)</button>
+              <button type="button" class="btn-secondary idor-target" data-student-id="STU-1108">STU-1108 (Synthetic Peer)</button>
+            </div>
+          </div>
+
+          <div class="split-grid">
+            <div class="card">
+              <div class="card-head">
+                <h3>Simulated API Response</h3>
+                <span class="status-badge" id="idor-http-status">READY</span>
+              </div>
+              <pre class="code-box" id="idor-response-box">Select a synthetic student ID above to query the local lab endpoint.</pre>
+            </div>
+            <div class="card">
+              <h3>Server Authorization Comparison</h3>
+              <pre class="code-box" id="idor-code-diff">// Vulnerable pattern (trusts client ID):
+record = db.get_student(req.params.student_id)
+return 200, record
+
+// Remediated pattern (enforces session ownership):
+if req.params.student_id != session.student_id:
+    return 403, {"error": "Ownership check failed"}
+return 200, minimize_fields(record)</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: FINDINGS PANEL -->
+      <div role="tabpanel" id="panel-findings" aria-labelledby="tab-findings" class="tab-panel" hidden>
+        <div class="panel-body">
+          <div class="panel-header">
+            <div>
+              <h2>Vulnerability Findings Panel</h2>
+              <p class="muted">Simulated &amp; observed research findings categorized by severity and CWE.</p>
+            </div>
+            <div class="btn-row" role="group" aria-label="Filter findings by severity">
+              <button type="button" class="btn-chip sev-filter" data-sev="ALL" aria-pressed="true">All</button>
+              <button type="button" class="btn-chip sev-filter" data-sev="Critical" aria-pressed="false">Critical</button>
+              <button type="button" class="btn-chip sev-filter" data-sev="High" aria-pressed="false">High</button>
+              <button type="button" class="btn-chip sev-filter" data-sev="Medium" aria-pressed="false">Medium</button>
+              <button type="button" class="btn-chip sev-filter" data-sev="Low" aria-pressed="false">Low</button>
+            </div>
+          </div>
+
+          <div tabindex="0" role="region" aria-labelledby="findings-caption" class="table-wrapper">
+            <table class="findings-table">
+              <caption id="findings-caption" class="sr-only">Simulated vulnerability findings inventory</caption>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Severity</th>
+                  <th>CWE</th>
+                  <th>Component</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="findings-tbody"></tbody>
+            </table>
+          </div>
+
+          <article class="card detail-card" id="finding-detail">
+            <h3>Finding Detail</h3>
+            <p class="muted">Select any row in the findings table to inspect technical details and remediation guidance.</p>
+          </article>
+        </div>
+      </div>
+
+      <!-- TAB 5: FINAL ASSESSMENT REPORT -->
+      <div role="tabpanel" id="panel-report" aria-labelledby="tab-report" class="tab-panel" hidden>
+        <div class="panel-body">
+          <div class="panel-header">
+            <div>
+              <h2>Final Security Assessment Report (Simulated)</h2>
+              <p class="muted">Compiled live from the active local simulation profile.</p>
+            </div>
+            <div class="btn-row">
+              <button type="button" id="btn-copy-report" class="btn-secondary">Copy Markdown</button>
+              <a href="/api/report?mode=vulnerable&format=markdown" id="btn-download-report" class="btn-primary">Download .md Report</a>
+            </div>
+          </div>
+          <pre class="code-box report-box" id="report-preview"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- TERMINAL EXECUTION LOG -->
+    <section class="terminal-panel" aria-label="Terminal execution log">
+      <div class="terminal-header">
+        <span>TERMINAL // EXECUTION TELEMETRY LOG</span>
+        <button type="button" id="btn-clear-log" class="btn-ghost">Clear Log</button>
+      </div>
+      <div id="terminal-log" class="terminal-body" role="log" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
